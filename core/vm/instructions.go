@@ -17,6 +17,7 @@
 package vm
 
 import (
+	"encoding/binary"
 	"math"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -447,7 +448,9 @@ func opBlockhash(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) (
 		lower = upper - historySize
 	}
 	if num64 >= lower && num64 < upper {
-		num.SetBytes(interpreter.evm.Context.GetHash(num64).Bytes())
+		var key common.Hash
+		binary.BigEndian.PutUint64(key[24:], num64 % params.HistoryServeWindow)
+		num.SetBytes(interpreter.evm.StateDB.GetState(params.HistoryStorageAddress, key).Bytes())
 	} else {
 		num.Clear()
 	}

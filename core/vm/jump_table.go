@@ -498,7 +498,7 @@ func newFrontierInstructionSet() JumpTable {
 		},
 		BLOCKHASH: {
 			execute:     opBlockhash,
-			constantGas: GasExtStep,
+			constantGas: GasExtStep + params.SloadGasFrontier,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),
 		},
