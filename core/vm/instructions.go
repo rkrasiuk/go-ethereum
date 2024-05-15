@@ -436,8 +436,9 @@ func opBlockhash(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) (
 		return nil, nil
 	}
 	historySize := uint64(256)
+	isPrague := interpreter.evm.ChainConfig().IsPrague(interpreter.evm.Context.BlockNumber, interpreter.evm.Context.Time)
 	// EIP-2935 extends the observable history window.
-	if interpreter.evm.ChainConfig().IsPrague(interpreter.evm.Context.BlockNumber, interpreter.evm.Context.Time) {
+	if isPrague {
 		historySize = params.HistoryServeWindow
 	}
 	var upper, lower uint64
@@ -448,9 +449,13 @@ func opBlockhash(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) (
 		lower = upper - historySize
 	}
 	if num64 >= lower && num64 < upper {
-		var key common.Hash
-		binary.BigEndian.PutUint64(key[24:], num64 % params.HistoryServeWindow)
-		num.SetBytes(interpreter.evm.StateDB.GetState(params.HistoryStorageAddress, key).Bytes())
+		if isPrague {
+			var key common.Hash
+			binary.BigEndian.PutUint64(key[24:], num64 % params.HistoryServeWindow)
+			num.SetBytes(interpreter.evm.StateDB.GetState(params.HistoryStorageAddress, key).Bytes())
+		} else {
+			num.SetBytes(interpreter.evm.Context.GetHash(num64).Bytes())
+		}
 	} else {
 		num.Clear()
 	}

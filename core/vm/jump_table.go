@@ -91,6 +91,7 @@ func newVerkleInstructionSet() JumpTable {
 func newPraugeInstructionSet() JumpTable {
 	instructionSet := newCancunInstructionSet()
 	enable3074(&instructionSet) // EIP-3074 AUTH & AUTHCALL
+	enable2935(&instructionSet)
 	return validate(instructionSet)
 }
 
@@ -498,7 +499,7 @@ func newFrontierInstructionSet() JumpTable {
 		},
 		BLOCKHASH: {
 			execute:     opBlockhash,
-			constantGas: GasExtStep + params.SloadGasFrontier,
+			constantGas: GasExtStep,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),
 		},
