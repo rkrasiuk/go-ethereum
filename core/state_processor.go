@@ -293,7 +293,7 @@ func ProcessBlockHashHistory(statedb *state.StateDB, header *types.Header, chain
 	if chainConfig.IsPrague(parent.Number, parent.Time) || prevNumber == 0 {
 		return
 	}
-	var low uint64
+	low := uint64(1) 
 	if number > params.HistoryServeWindow {
 		low = number - params.HistoryServeWindow
 	}
